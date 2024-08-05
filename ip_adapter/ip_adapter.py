@@ -24,6 +24,22 @@ else:
     from .attention_processor import AttnProcessor, CNAttnProcessor, IPAttnProcessor
 from .resampler import Resampler
 
+class ImageProjModelCustomized(torch.nn.Module):
+    """Projection Model Customized"""
+
+    def __init__(self, cross_attention_dim=1024, clip_embeddings_dim=1024, clip_extra_context_tokens=4):
+        super().__init__()
+
+        self.cross_attention_dim = cross_attention_dim
+        self.clip_extra_context_tokens = clip_extra_context_tokens
+       
+    def forward(self, image_embeds):
+        image_embeds = image_embeds.repeat(1, 2*self.clip_extra_context_tokens)
+        image_embeds = image_embeds.reshape(
+            -1, self.clip_extra_context_tokens, self.cross_attention_dim
+        )
+
+        return image_embeds
 
 class ImageProjModel(torch.nn.Module):
     """Projection Model"""
